@@ -1,0 +1,140 @@
+{
+  "name": "mcp-shark-viewer-for-vscode",
+  "publisher": "mcp-shark",
+  "displayName": "MCP Shark Viewer",
+  "description": "View and analyze MCP Shark traffic data directly in VS Code, Cursor, and Windsurf. Monitor packets, conversations, and statistics from your MCP server interactions.",
+  "version": "1.0.0",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other",
+    "Debuggers"
+  ],
+  "keywords": [
+    "mcp",
+    "mcp-shark",
+    "model-context-protocol",
+    "database",
+    "viewer",
+    "monitoring",
+    "debugging",
+    "traffic",
+    "packets"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "mcp-shark",
+          "title": "MCP Shark",
+          "icon": "icon.png"
+        }
+      ]
+    },
+    "views": {
+      "mcp-shark": [
+        {
+          "id": "mcp-shark-traffic",
+          "name": "Traffic Inspector",
+          "when": "true"
+        }
+      ]
+    },
+        "commands": [
+        {
+          "command": "mcp-shark.viewer.startServer",
+          "title": "Start MCP Shark Server",
+          "category": "MCP Shark",
+          "icon": "$(play)"
+        },
+        {
+          "command": "mcp-shark.viewer.stopServer",
+          "title": "Stop MCP Shark Server",
+          "category": "MCP Shark",
+          "icon": "$(stop-circle)"
+        },
+        {
+          "command": "mcp-shark.viewer.showDatabasePanel",
+          "title": "MCP Shark Traffic inspector",
+          "category": "MCP Shark",
+          "icon": "$(database)"
+        },
+        {
+          "command": "mcp-shark.viewer.openInspector",
+          "title": "Open Traffic Inspector",
+          "icon": "$(database)"
+        },
+        {
+          "command": "mcp-shark.viewer.refresh",
+          "title": "Refresh",
+          "icon": "$(refresh)"
+        }
+        ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "mcp-shark.viewer.showDatabasePanel",
+          "when": "true",
+          "group": "navigation"
+        },
+        {
+          "command": "mcp-shark.viewer.refresh",
+          "when": "view == mcp-shark-traffic",
+          "group": "navigation@1"
+        }
+      ],
+      "view/container/title": [
+        {
+          "command": "mcp-shark.viewer.showDatabasePanel",
+          "when": "true",
+          "group": "navigation"
+        }
+      ],
+      "view/menu": [
+        {
+          "command": "mcp-shark.viewer.showDatabasePanel",
+          "when": "true",
+          "group": "navigation@1"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "mcp-shark.viewer.openInspector",
+          "when": "view == mcp-shark-traffic",
+          "group": "inline"
+        },
+        {
+          "command": "mcp-shark.viewer.refresh",
+          "when": "view == mcp-shark-traffic",
+          "group": "inline@1"
+        }
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "validate": "node scripts/validate.js",
+    "prebuild": "npm run validate",
+    "test": "npm run validate"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4"
+  },
+  "dependencies": {
+    "sql.js": "^1.10.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mcp-shark/mcp-shark-viewer-vscode"
+  }
+}

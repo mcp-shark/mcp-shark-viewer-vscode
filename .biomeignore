@@ -1,0 +1,7 @@
+node_modules
+*.vsix
+*.png
+op.txt
+package-lock.json
+
+
