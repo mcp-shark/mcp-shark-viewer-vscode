@@ -4,7 +4,7 @@ const os = require("node:os");
 const { MCP_SHARK_BASE_URL, MCP_SHARK_PORT } = require("../constants");
 const { httpGetStatusCode } = require("./http");
 const { createMcpSharkSettingsCache, fetchMcpSharkSettings } = require("./settings");
-const { getActivePanel } = require("../webview");
+const { getActivePanel } = require("../webview/panelState");
 
 const settingsCache = createMcpSharkSettingsCache();
 

@@ -1,23 +1,6 @@
 const { getMcpSharkIframeHtml, getStartServerHtml } = require("./html");
 const { ensureMcpSharkRunning, isMcpSharkRunning, stopMcpSharkServer } = require("../mcp-shark");
-
-// Track the active panel globally so we can send output to it
-const activePanelState = {
-  value: null,
-};
-
-const getActivePanel = () => activePanelState.value;
-const setActivePanel = (panel) => {
-  activePanelState.value = panel;
-  if (panel) {
-    // Clear panel reference when it's disposed
-    panel.onDidDispose(() => {
-      if (activePanelState.value === panel) {
-        activePanelState.value = null;
-      }
-    });
-  }
-};
+const { setActivePanel } = require("./panelState");
 
 const createDatabasePanel = async ({ context, vscode }) => {
   const mediaRoot = vscode.Uri.joinPath(context.extensionUri, "media");
@@ -120,7 +103,6 @@ const createDatabasePanel = async ({ context, vscode }) => {
 
 module.exports = {
   createDatabasePanel,
-  getActivePanel,
 };
 
 
