@@ -66,22 +66,22 @@ const ensureMcpSharkRunning = async ({ vscode, webviewPanel = null }) => {
 
   // Send initial message
   sendOutput("Starting MCP Shark server...\n", "stdout");
-  sendOutput(`Running: npx -y @mcp-shark/mcp-shark\n`, "stdout");
+  sendOutput("Running: npx -y @mcp-shark/mcp-shark\n", "stdout");
 
   // Capture stdout
   child.stdout.on("data", (data) => {
     const lines = data.toString().split("\n").filter((line) => line.trim());
-    lines.forEach((line) => {
-      sendOutput(line + "\n", "stdout");
-    });
+    for (const line of lines) {
+      sendOutput(`${line}\n`, "stdout");
+    }
   });
 
   // Capture stderr
   child.stderr.on("data", (data) => {
     const lines = data.toString().split("\n").filter((line) => line.trim());
-    lines.forEach((line) => {
-      sendOutput(line + "\n", "stderr");
-    });
+    for (const line of lines) {
+      sendOutput(`${line}\n`, "stderr");
+    }
   });
 
   // Handle process exit
