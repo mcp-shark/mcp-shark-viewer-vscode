@@ -1,4 +1,4 @@
-const { spawn, exec } = require("node:child_process");
+const { exec } = require("node:child_process");
 const os = require("node:os");
 
 const { MCP_SHARK_BASE_URL, MCP_SHARK_PORT } = require("../constants");
@@ -41,15 +41,20 @@ const ensureMcpSharkRunning = async ({ vscode }) => {
     return false;
   }
 
+  // Create a terminal to show server output
+  const terminal = vscode.window.createTerminal({
+    name: "MCP Shark Server",
+    hideFromUser: false,
+  });
+
+  // Show the terminal panel so users can see the output
+  terminal.show(true);
+
+  // Send the command to the terminal
+  terminal.sendText("npx -y @mcp-shark/mcp-shark");
+
+  // Poll for server readiness
   return new Promise((resolve) => {
-    const child = spawn("npx", ["-y", "@mcp-shark/mcp-shark"], {
-      detached: true,
-      stdio: "ignore",
-      shell: true,
-    });
-
-    child.unref();
-
     setTimeout(() => {
       const state = { attempts: 0 };
       const maxAttempts = 30;
@@ -75,7 +80,7 @@ const ensureMcpSharkRunning = async ({ vscode }) => {
         if (state.attempts >= maxAttempts) {
           clearInterval(checkInterval);
           vscode.window.showWarningMessage(
-            "MCP Shark server may not have started. Please start it manually with: npx -y @mcp-shark/mcp-shark",
+            "MCP Shark server may not have started. Please check the terminal output for errors.",
             "OK"
           );
           resolve(false);
