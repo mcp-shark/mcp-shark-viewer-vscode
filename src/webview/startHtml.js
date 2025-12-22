@@ -90,13 +90,15 @@ function getStartServerHtml({ message = null, imageUri = null, showOutput = fals
         }
 
         .output-header {
-            background: var(--accent-blue);
-            color: white;
+            background: var(--terminal-bg);
+            color: var(--terminal-text);
             padding: 12px 16px;
             font-size: 14px;
             font-weight: 500;
             border-radius: 4px 4px 0 0;
             flex-shrink: 0;
+            font-family: 'Monaco', 'Menlo', monospace;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .output-terminal {
