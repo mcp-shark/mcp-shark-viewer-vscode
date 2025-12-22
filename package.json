@@ -3,7 +3,7 @@
   "publisher": "MCPSharkInspector",
   "displayName": "MCP Shark Viewer",
   "description": "View and analyze MCP Shark traffic data directly in VS Code, Cursor, and Windsurf. Monitor packets, conversations, and statistics from your MCP server interactions.",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "icon": "icon.png",
   "engines": {
     "vscode": "^1.74.0"
