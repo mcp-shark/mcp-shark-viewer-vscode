@@ -76,13 +76,6 @@ class TrafficInspectorProvider {
           contextValue: "openInspector",
         },
         {
-          label: "View Statistics",
-          command: COMMAND_IDS.showDatabasePanel,
-          icon: "graph",
-          tooltip: "View traffic statistics and data",
-          contextValue: "viewStatistics",
-        },
-        {
           label: "Stop MCP Shark Server",
           command: COMMAND_IDS.stopServer,
           icon: "stop-circle",
@@ -98,13 +91,6 @@ class TrafficInspectorProvider {
           icon: "network",
           tooltip: "MCP Shark server must be running first",
           contextValue: "openInspectorDisabled",
-        },
-        {
-          label: "View Statistics",
-          command: COMMAND_IDS.showDatabasePanel,
-          icon: "graph",
-          tooltip: "MCP Shark server must be running first",
-          contextValue: "viewStatisticsDisabled",
         }
       );
     }

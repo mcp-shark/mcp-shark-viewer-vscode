@@ -28,7 +28,6 @@
     "onView:mcp-shark-traffic",
     "onCommand:mcp-shark.viewer.startServer",
     "onCommand:mcp-shark.viewer.stopServer",
-    "onCommand:mcp-shark.viewer.showDatabasePanel",
     "onCommand:mcp-shark.viewer.openInspector",
     "onCommand:mcp-shark.viewer.refresh"
   ],
@@ -67,12 +66,6 @@
         "icon": "$(stop-circle)"
       },
       {
-        "command": "mcp-shark.viewer.showDatabasePanel",
-        "title": "MCP Shark Traffic inspector",
-        "category": "MCP Shark",
-        "icon": "$(database)"
-      },
-      {
         "command": "mcp-shark.viewer.openInspector",
         "title": "Open Traffic Inspector",
         "icon": "$(database)"
@@ -86,28 +79,9 @@
     "menus": {
       "view/title": [
         {
-          "command": "mcp-shark.viewer.showDatabasePanel",
-          "when": "true",
-          "group": "navigation"
-        },
-        {
           "command": "mcp-shark.viewer.refresh",
           "when": "view == mcp-shark-traffic",
-          "group": "navigation@1"
-        }
-      ],
-      "view/container/title": [
-        {
-          "command": "mcp-shark.viewer.showDatabasePanel",
-          "when": "true",
           "group": "navigation"
-        }
-      ],
-      "view/menu": [
-        {
-          "command": "mcp-shark.viewer.showDatabasePanel",
-          "when": "true",
-          "group": "navigation@1"
         }
       ],
       "view/item/context": [

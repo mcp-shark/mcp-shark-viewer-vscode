@@ -90,28 +90,6 @@ const activate = (context) => {
     await trafficInspectorProvider.updateServerStatus();
   });
 
-  const databasePanelDisposable = vscode.commands.registerCommand(
-    COMMAND_IDS.showDatabasePanel,
-    async () => {
-      const isRunning = await isMcpSharkRunning();
-      if (!isRunning) {
-        vscode.window
-          .showWarningMessage(
-            "MCP Shark server is not running. Please start it first.",
-            "Start Server"
-          )
-          .then((action) => {
-            if (action === "Start Server") {
-              vscode.commands.executeCommand(COMMAND_IDS.startServer);
-            }
-          });
-        return;
-      }
-
-      await createDatabasePanel({ context, vscode });
-    }
-  );
-
   const stopServerDisposable = vscode.commands.registerCommand(COMMAND_IDS.stopServer, async () => {
     const isRunning = await isMcpSharkRunning();
     if (!isRunning) {
@@ -137,7 +115,6 @@ const activate = (context) => {
     startServerDisposable,
     openInspectorDisposable,
     refreshDisposable,
-    databasePanelDisposable,
     stopServerDisposable,
     windowStateChangeDisposable
   );
