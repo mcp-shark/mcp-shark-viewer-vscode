@@ -1,11 +1,11 @@
-function getStartServerHtml({ message = null, imageUri = null } = {}) {
+function getStartServerHtml({ message = null, imageUri = null, showOutput = false, output = "" } = {}) {
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCP Shark - Start Server</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Monaco,Menlo,monospace&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #ffffff;
@@ -17,6 +17,9 @@ function getStartServerHtml({ message = null, imageUri = null } = {}) {
             --button-primary-hover: #3367d6;
             --border-light: #dadce0;
             --error: #ea4335;
+            --terminal-bg: #1e1e1e;
+            --terminal-text: #d4d4d4;
+            --terminal-stderr: #f48771;
         }
         
         * {
@@ -30,8 +33,7 @@ function getStartServerHtml({ message = null, imageUri = null } = {}) {
             background: var(--bg-primary);
             color: var(--text-primary);
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
             min-height: 100vh;
             padding: 20px;
         }
@@ -40,6 +42,8 @@ function getStartServerHtml({ message = null, imageUri = null } = {}) {
             text-align: center;
             max-width: 500px;
             width: 100%;
+            margin: 0 auto;
+            ${showOutput ? "display: none;" : ""}
         }
         
         .icon {
@@ -70,6 +74,47 @@ function getStartServerHtml({ message = null, imageUri = null } = {}) {
             margin-bottom: 32px;
             line-height: 1.6;
         }
+
+        .output-container {
+            display: ${showOutput ? "flex" : "none"};
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .output-header {
+            background: var(--accent-blue);
+            color: white;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .output-terminal {
+            background: var(--terminal-bg);
+            color: var(--terminal-text);
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+            padding: 16px;
+            border-radius: 0 0 4px 4px;
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 300px;
+            max-height: calc(100vh - 200px);
+        }
+
+        .output-terminal .stderr {
+            color: var(--terminal-stderr);
+        }
+
+        .output-terminal .stdout {
+            color: var(--terminal-text);
+        }
     </style>
 </head>
 <body>
@@ -83,6 +128,29 @@ function getStartServerHtml({ message = null, imageUri = null } = {}) {
             }
         </p>
     </div>
+    <div class="output-container">
+        <div class="output-header">MCP Shark Server Output</div>
+        <div class="output-terminal" id="output">${output}</div>
+    </div>
+    <script>
+        const vscode = acquireVsCodeApi();
+        const outputEl = document.getElementById('output');
+
+        // Listen for server output messages
+        window.addEventListener('message', event => {
+            const message = event.data;
+            if (message.command === 'serverOutput') {
+                const line = message.line || '';
+                const type = message.type || 'stdout';
+                const span = document.createElement('span');
+                span.className = type;
+                span.textContent = line;
+                outputEl.appendChild(span);
+                // Auto-scroll to bottom
+                outputEl.scrollTop = outputEl.scrollHeight;
+            }
+        });
+    </script>
 </body>
 </html>`;
 }

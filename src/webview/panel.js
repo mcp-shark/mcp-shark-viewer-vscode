@@ -23,7 +23,14 @@ const createDatabasePanel = async ({ context, vscode }) => {
     panel.webview.onDidReceiveMessage(
       async (message) => {
         if (message.command === "startServer") {
-          await ensureMcpSharkRunning({ vscode });
+          // Update HTML to show output area
+          panel.webview.html = getStartServerHtml({ 
+            imageUri, 
+            showOutput: true,
+            output: "Starting server...\n"
+          });
+
+          await ensureMcpSharkRunning({ vscode, webviewPanel: panel });
 
           setTimeout(async () => {
             const running = await isMcpSharkRunning();
@@ -33,6 +40,7 @@ const createDatabasePanel = async ({ context, vscode }) => {
               panel.webview.html = getStartServerHtml({
                 message: "Server may still be starting. Please wait a moment and try again.",
                 imageUri,
+                showOutput: true,
               });
             }
           }, 3000);

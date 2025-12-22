@@ -1,4 +1,4 @@
-const { exec } = require("node:child_process");
+const { spawn, exec } = require("node:child_process");
 const os = require("node:os");
 
 const { MCP_SHARK_BASE_URL, MCP_SHARK_PORT } = require("../constants");
@@ -19,7 +19,7 @@ const isMcpSharkRunning = async () => {
   return false;
 };
 
-const ensureMcpSharkRunning = async ({ vscode }) => {
+const ensureMcpSharkRunning = async ({ vscode, webviewPanel = null }) => {
   const isRunning = await isMcpSharkRunning();
   if (isRunning) {
     try {
@@ -41,17 +41,55 @@ const ensureMcpSharkRunning = async ({ vscode }) => {
     return false;
   }
 
-  // Create a terminal to show server output
-  const terminal = vscode.window.createTerminal({
-    name: "MCP Shark Server",
-    hideFromUser: false,
+  // If webview panel is provided, send output to it
+  const sendOutput = (line, type = "stdout") => {
+    if (webviewPanel) {
+      webviewPanel.webview.postMessage({
+        command: "serverOutput",
+        line,
+        type,
+      });
+    }
+  };
+
+  // Spawn the process and capture stdout/stderr
+  const child = spawn("npx", ["-y", "@mcp-shark/mcp-shark"], {
+    shell: true,
+    stdio: ["ignore", "pipe", "pipe"],
   });
 
-  // Show the terminal panel so users can see the output
-  terminal.show(true);
+  // Send initial message
+  sendOutput("Starting MCP Shark server...\n", "stdout");
+  sendOutput(`Running: npx -y @mcp-shark/mcp-shark\n`, "stdout");
 
-  // Send the command to the terminal
-  terminal.sendText("npx -y @mcp-shark/mcp-shark");
+  // Capture stdout
+  child.stdout.on("data", (data) => {
+    const lines = data.toString().split("\n").filter((line) => line.trim());
+    lines.forEach((line) => {
+      sendOutput(line + "\n", "stdout");
+    });
+  });
+
+  // Capture stderr
+  child.stderr.on("data", (data) => {
+    const lines = data.toString().split("\n").filter((line) => line.trim());
+    lines.forEach((line) => {
+      sendOutput(line + "\n", "stderr");
+    });
+  });
+
+  // Handle process exit
+  child.on("exit", (code) => {
+    if (code === 0) {
+      sendOutput("\n✓ Server process exited normally\n", "stdout");
+    } else {
+      sendOutput(`\n✗ Server process exited with code ${code}\n`, "stderr");
+    }
+  });
+
+  child.on("error", (error) => {
+    sendOutput(`\n✗ Error starting server: ${error.message}\n`, "stderr");
+  });
 
   // Poll for server readiness
   return new Promise((resolve) => {
@@ -65,6 +103,7 @@ const ensureMcpSharkRunning = async ({ vscode }) => {
         const running = await isMcpSharkRunning();
         if (running) {
           clearInterval(checkInterval);
+          sendOutput("\n✓ MCP Shark server is now running!\n", "stdout");
 
           try {
             await fetchMcpSharkSettings({ cache: settingsCache });
@@ -79,8 +118,9 @@ const ensureMcpSharkRunning = async ({ vscode }) => {
 
         if (state.attempts >= maxAttempts) {
           clearInterval(checkInterval);
+          sendOutput("\n⚠ Server may not have started. Please check the output above for errors.\n", "stderr");
           vscode.window.showWarningMessage(
-            "MCP Shark server may not have started. Please check the terminal output for errors.",
+            "MCP Shark server may not have started. Please check the output for errors.",
             "OK"
           );
           resolve(false);
