@@ -36,7 +36,6 @@ class TrafficInspectorProvider {
 
     const iconMap = {
       database: "database",
-      graph: "graph",
       network: "radio-tower",
       refresh: "refresh",
       play: "play",
