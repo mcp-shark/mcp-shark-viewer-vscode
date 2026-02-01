@@ -1,8 +1,16 @@
+const vscode = require("vscode");
 const { getMcpSharkIframeHtml, getStartServerHtml } = require("./html");
+const { requestLlmAnalysis } = require("../llm");
 const { ensureMcpSharkRunning, isMcpSharkRunning, isMcpSharkSetupComplete, stopMcpSharkServer } = require("../mcp-shark");
-const { setActivePanel } = require("./panelState");
+const { getActivePanel, setActivePanel } = require("./panelState");
 
 const createDatabasePanel = async ({ context, vscode }) => {
+  const existing = getActivePanel();
+  if (existing) {
+    existing.reveal(vscode.ViewColumn.One);
+    return existing;
+  }
+
   const mediaRoot = vscode.Uri.joinPath(context.extensionUri, "media");
   const panel = vscode.window.createWebviewPanel(
     "mcpSharkDatabase",
@@ -12,6 +20,7 @@ const createDatabasePanel = async ({ context, vscode }) => {
       enableScripts: true,
       retainContextWhenHidden: true,
       localResourceRoots: [mediaRoot],
+      enableFindWidget: true,
     }
   );
 
@@ -104,6 +113,20 @@ const createDatabasePanel = async ({ context, vscode }) => {
             });
           }
         }, 2000);
+      }
+
+      if (message.command === "requestLlmAnalysis") {
+        const { prompt = "", context: contextText = "" } = message;
+        const outcome = await requestLlmAnalysis({
+          vscode,
+          prompt: typeof prompt === "string" ? prompt : "",
+          context: typeof contextText === "string" ? contextText : "",
+        });
+        panel.webview.postMessage({
+          command: "requestLlmAnalysisResult",
+          result: outcome.result,
+          error: outcome.error,
+        });
       }
     },
     null,

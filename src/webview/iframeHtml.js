@@ -1,10 +1,12 @@
 const { MCP_SHARK_BASE_URL } = require("../constants");
 
 function getMcpSharkIframeHtml({ route = "traffic" } = {}) {
-  // Route can be "setup" or "traffic"
-  const iframeUrl = route === "setup" 
-    ? `${MCP_SHARK_BASE_URL}/#/setup`
-    : `${MCP_SHARK_BASE_URL}/#/traffic`;
+  // Route can be "setup" or "traffic"; ?embed=vscode-viewer so MCP Shark UI shows extension-only UI
+  const embedParam = "embed=vscode-viewer";
+  const iframeUrl =
+    route === "setup"
+      ? `${MCP_SHARK_BASE_URL}/#/setup?${embedParam}`
+      : `${MCP_SHARK_BASE_URL}/#/traffic?${embedParam}`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,6 +24,8 @@ function getMcpSharkIframeHtml({ route = "traffic" } = {}) {
             height: 100%;
             overflow: hidden;
             background: #ffffff;
+            -webkit-user-select: text;
+            user-select: text;
         }
         .container {
             width: 100%;
@@ -153,6 +157,27 @@ function getMcpSharkIframeHtml({ route = "traffic" } = {}) {
                 vscode.postMessage({ command: 'stopServer' });
             }
         }
+        
+        // Bridge messages: iframe <-> extension (for local LLM analysis)
+        window.addEventListener('message', (event) => {
+            if (event.data?.type === 'mcp-shark-viewer/requestLlmAnalysis') {
+                vscode.postMessage({
+                    command: 'requestLlmAnalysis',
+                    prompt: event.data.prompt || '',
+                    context: event.data.context || ''
+                });
+            }
+            if (event.data?.command === 'requestLlmAnalysisResult') {
+                const iframe = document.querySelector('iframe');
+                if (iframe?.contentWindow) {
+                    iframe.contentWindow.postMessage({
+                        type: 'mcp-shark-viewer/requestLlmAnalysisResult',
+                        result: event.data.result,
+                        error: event.data.error
+                    }, '*');
+                }
+            }
+        });
         
         // Check status periodically
         setInterval(() => {

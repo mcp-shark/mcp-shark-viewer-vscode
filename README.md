@@ -46,6 +46,7 @@ MCP Shark (the server + UI) is the upstream project: [mcp-shark/mcp-shark](https
 - **Embedded UI**: Webview panel that iframes the MCP Shark UI (`http://localhost:9853`).
 - **Server lifecycle**: start/stop MCP Shark from inside the IDE.
 - **Settings fetch**: when MCP Shark is reachable, the extension calls `GET /api/settings` (API reference: [GET /api/settings](https://github.com/mcp-shark/mcp-shark/blob/main/docs/api-reference.md#get-apisettings)).
+- **Local LLM analysis**: Use the IDE's language model (VS Code / Cursor) for analysis. Run **MCP Shark: Run Local LLM Analysis** from the Command Palette, or call the extension's HTTP bridge (`POST http://127.0.0.1:9854/analyze` with JSON `{ "prompt", "context" }`) so MCP Shark or other tools can request analysis. Requires VS Code 1.108+ (or Cursor) with an available chat model (e.g. GitHub Copilot). Bridge can be disabled or its port changed in settings.
 
 ## Commands
 
@@ -53,15 +54,15 @@ MCP Shark (the server + UI) is the upstream project: [mcp-shark/mcp-shark](https
 | --- | --- |
 | `mcp-shark.viewer.startServer` | Start MCP Shark Server |
 | `mcp-shark.viewer.stopServer` | Stop MCP Shark Server |
-| `mcp-shark.viewer.openInspector` | Open Traffic Inspector |
-| `mcp-shark.viewer.showDatabasePanel` | MCP Shark Traffic inspector |
+| `mcp-shark.viewer.openInspector` | Open Viewer |
 | `mcp-shark.viewer.refresh` | Refresh |
+| `mcp-shark.viewer.runLocalAnalysis` | Run Local LLM Analysis |
 
 ## Getting Started
 
 1. Open the Activity Bar → **MCP Shark** → **Traffic Inspector**
 2. Run **Start MCP Shark Server** (Command Palette)
-3. Run **Open Traffic Inspector** to open the embedded UI panel
+3. Run **Open Viewer** to open the MCP Shark viewer panel
 4. In the MCP Shark UI, go to **MCP Server Setup** and **start the MCP server** (select your IDE config / servers, then click **Start MCP Shark**)
 5. For full MCP Shark first-run + setup instructions, see: [Getting Started](https://github.com/mcp-shark/mcp-shark/blob/main/docs/getting-started.md)
 6. For MCP Shark install/CLI usage, see the upstream README: [mcp-shark/mcp-shark README](https://github.com/mcp-shark/mcp-shark/blob/main/README.md)

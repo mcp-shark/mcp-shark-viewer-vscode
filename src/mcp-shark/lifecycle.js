@@ -1,4 +1,6 @@
 const { spawn, exec } = require("node:child_process");
+const fs = require("node:fs");
+const path = require("node:path");
 const os = require("node:os");
 
 const { MCP_SHARK_BASE_URL, MCP_SHARK_PORT } = require("../constants");
@@ -58,15 +60,35 @@ const ensureMcpSharkRunning = async ({ vscode, webviewPanel = null }) => {
     }
   };
 
-  // Spawn the process and capture stdout/stderr
-  const child = spawn("npx", ["-y", "@mcp-shark/mcp-shark@latest"], {
-    shell: true,
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  // Temporary: use local build if configured (for testing until upstream is fixed), otherwise npx
+  const config = vscode.workspace.getConfiguration("mcpShark");
+  const localPath = (config.get("server.localPath") || "").trim();
+  const binPath = localPath ? path.join(localPath, "bin", "mcp-shark.js") : null;
+  const useLocal = binPath && fs.existsSync(binPath);
 
-  // Send initial message
+  sendOutput(`useLocal: ${useLocal}\n`, "stdout");
+  sendOutput(`binPath: ${binPath}\n`, "stdout");
+  sendOutput(`localPath: ${localPath}\n`, "stdout");
+  sendOutput(`config.get("server.localPath"): ${config.get("server.localPath")}\n`, "stdout");
+  sendOutput(`path.resolve(localPath): ${path.resolve(localPath)}\n`, "stdout");
+  let child;
+  if (true) {
+    // Use system node (not process.execPath — in Extension Host that can be "Code Helper (Plugin)" and break under shell)
+    child = spawn("node", [binPath], {
+      cwd: path.resolve(localPath),
+      shell: false,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  } else {
+    child = spawn("npx", ["-y", "@mcp-shark/mcp-shark@latest"], {
+      shell: false,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+  }
+
+  const runDesc = useLocal ? `node ${binPath} (cwd: ${localPath})` : "npx -y @mcp-shark/mcp-shark@latest";
   sendOutput("Starting MCP Shark server...\n", "stdout");
-  sendOutput("Running: npx -y @mcp-shark/mcp-shark@latest\n", "stdout");
+  sendOutput(`Running: ${runDesc}\n`, "stdout");
 
   // Capture stdout
   child.stdout.on("data", (data) => {

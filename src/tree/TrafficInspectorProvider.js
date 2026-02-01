@@ -68,10 +68,10 @@ class TrafficInspectorProvider {
     if (this.isServerRunning) {
       items.push(
         {
-          label: "Open Traffic Inspector",
+          label: "Open Viewer",
           command: COMMAND_IDS.openInspector,
           icon: "network",
-          tooltip: "Open the MCP Shark Traffic Inspector panel",
+          tooltip: "Open the MCP Shark viewer panel",
           contextValue: "openInspector",
         },
         {
@@ -85,7 +85,7 @@ class TrafficInspectorProvider {
     } else {
       items.push(
         {
-          label: "Open Traffic Inspector",
+          label: "Open Viewer",
           command: COMMAND_IDS.openInspector,
           icon: "network",
           tooltip: "MCP Shark server must be running first",

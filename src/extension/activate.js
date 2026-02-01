@@ -1,6 +1,7 @@
 const vscode = require("vscode");
 
 const { COMMAND_IDS, VIEW_ID_TRAFFIC } = require("../constants");
+const { requestLlmAnalysis, startLlmBridgeServer, stopLlmBridgeServer } = require("../llm");
 const { ensureMcpSharkRunning, isMcpSharkRunning, stopMcpSharkServer } = require("../mcp-shark");
 const { createDatabasePanel, getStartServerHtml } = require("../webview");
 const { TrafficInspectorProvider } = require("../tree");
@@ -110,12 +111,53 @@ const activate = (context) => {
     }
   });
 
+  const runLocalAnalysisDisposable = vscode.commands.registerCommand(
+    COMMAND_IDS.runLocalAnalysis,
+    async () => {
+      const prompt = await vscode.window.showInputBox({
+        title: "MCP Shark: Local LLM Analysis",
+        prompt: "Enter what you want the IDE's language model to analyze (e.g. MCP traffic summary, tool usage).",
+        placeHolder: "Summarize or analyze the MCP traffic...",
+      });
+      if (prompt == null || prompt.trim() === "") {
+        return;
+      }
+      const editor = vscode.window.activeTextEditor;
+      const contextText = editor?.document
+        ? editor.document.getText(editor.selection) || editor.document.getText()
+        : "";
+      const channel = vscode.window.createOutputChannel("MCP Shark (Local Analysis)");
+      channel.clear();
+      channel.appendLine("Running local analysis with IDE language model...");
+      const outcome = await requestLlmAnalysis({
+        vscode,
+        prompt: prompt.trim(),
+        context: contextText.slice(0, 32000),
+      });
+      if (outcome.error) {
+        channel.appendLine(`Error: ${outcome.error}`);
+        channel.show(true);
+        return;
+      }
+      channel.appendLine(outcome.result);
+      channel.show(true);
+    }
+  );
+
+  const llmBridge = startLlmBridgeServer({ vscode });
+  if (llmBridge) {
+    context.subscriptions.push({
+      dispose: () => stopLlmBridgeServer(llmBridge.server),
+    });
+  }
+
   context.subscriptions.push(
     treeView,
     startServerDisposable,
     openInspectorDisposable,
     refreshDisposable,
     stopServerDisposable,
+    runLocalAnalysisDisposable,
     windowStateChangeDisposable
   );
 };

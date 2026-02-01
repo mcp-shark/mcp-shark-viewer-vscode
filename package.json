@@ -29,7 +29,8 @@
     "onCommand:mcp-shark.viewer.startServer",
     "onCommand:mcp-shark.viewer.stopServer",
     "onCommand:mcp-shark.viewer.openInspector",
-    "onCommand:mcp-shark.viewer.refresh"
+    "onCommand:mcp-shark.viewer.refresh",
+    "onCommand:mcp-shark.viewer.runLocalAnalysis"
   ],
   "main": "./extension.js",
   "contributes": {
@@ -67,17 +68,54 @@
       },
       {
         "command": "mcp-shark.viewer.openInspector",
-        "title": "Open Traffic Inspector",
+        "title": "Open Viewer",
+        "category": "MCP Shark",
         "icon": "$(database)"
       },
       {
         "command": "mcp-shark.viewer.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "mcp-shark.viewer.runLocalAnalysis",
+        "title": "Run Local LLM Analysis",
+        "category": "MCP Shark",
+        "icon": "$(sparkle)"
       }
     ],
+    "configuration": {
+      "title": "MCP Shark",
+      "properties": {
+        "mcpShark.localAnalysis.bridgeEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the HTTP bridge so MCP Shark (or other tools) can request local analysis using the IDE's language model."
+        },
+        "mcpShark.localAnalysis.bridgePort": {
+          "type": "number",
+          "default": 9854,
+          "description": "Port for the local LLM analysis bridge (POST /analyze with JSON body: { \"prompt\", \"context\" })."
+        },
+        "mcpShark.localAnalysis.modelVendor": {
+          "type": "string",
+          "default": "",
+          "description": "Optional vendor filter for the IDE language model (e.g. 'copilot'). Use if you get 'model not supported' with the default model."
+        },
+        "mcpShark.server.localPath": {
+          "type": "string",
+          "default": "/Users/ruwan/dev/mcp-shark-org/mcp-shark",
+          "description": "[Temporary] Path to local MCP Shark repo to test extension against a local build. When set, runs `node bin/mcp-shark.js` from that path instead of npx."
+        }
+      }
+    },
     "menus": {
       "view/title": [
+        {
+          "command": "mcp-shark.viewer.openInspector",
+          "when": "view == mcp-shark-traffic",
+          "group": "navigation"
+        },
         {
           "command": "mcp-shark.viewer.refresh",
           "when": "view == mcp-shark-traffic",

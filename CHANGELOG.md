@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Local LLM analysis**: Use the IDE's language model (VS Code / Cursor) for local analysis. Run **MCP Shark: Run Local LLM Analysis** from the Command Palette, or have MCP Shark call the extension via the HTTP bridge.
+- **LLM bridge server**: Optional HTTP server (default port 9854) that accepts `POST /analyze` with JSON `{ "prompt", "context" }` so MCP Shark or other tools can request analysis using the IDE's LLM. Enable/disable and port via settings `mcpShark.localAnalysis.bridgeEnabled` and `mcpShark.localAnalysis.bridgePort`.
+- **Webview bridge**: The embedded MCP Shark UI (iframe) can request analysis by posting `{ type: 'mcp-shark-viewer/requestLlmAnalysis', prompt, context }` to the parent; the extension runs the LLM and posts back `{ type: 'mcp-shark-viewer/requestLlmAnalysisResult', result, error }`.
+- Iframe URL now includes `?embed=vscode-viewer` so the MCP Shark UI can show extension-only UI (e.g. "Running in VS Code / Cursor" bar and "Analyze with IDE LLM").
 - Automatic routing to setup page (`/setup`) if MCP server is not configured
 - Automatic routing to traffic page (`/traffic`) if MCP server is ready
 - Server output display in webview HTML terminal with real-time stdio capture

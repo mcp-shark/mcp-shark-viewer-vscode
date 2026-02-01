@@ -38,6 +38,8 @@ function getStartServerHtml({ message = null, imageUri = null, showOutput = fals
             margin: 0;
             padding: 0;
             overflow: hidden;
+            -webkit-user-select: text;
+            user-select: text;
         }
         
         .container {
@@ -115,6 +117,8 @@ function getStartServerHtml({ message = null, imageUri = null, showOutput = fals
             white-space: pre-wrap;
             word-wrap: break-word;
             min-height: 0;
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         .output-terminal .stderr {
